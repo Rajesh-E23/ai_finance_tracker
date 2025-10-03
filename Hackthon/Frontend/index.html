@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="appTitle">FinSmart - Personal Finance Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+</head>
+<body>
+
+    <div id="notification" class="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <aside class="sidebar">
+        <div class="logo" data-i18n="logo">FinSmart</div>
+        <nav class="main-menu">
+            <ul>
+                <li><a href="#" class="menu-link active" data-target="dashboard"><i class="fas fa-home"></i> <span data-i18n="dashboard">Dashboard</span></a></li>
+                <li><a href="#" class="menu-link" data-target="add-transaction"><i class="fas fa-plus-circle"></i> <span data-i18n="addTransaction">Add Transaction</span></a></li>
+                <li><a href="#" class="menu-link" data-target="transactions"><i class="fas fa-list"></i> <span data-i18n="transactions">Transactions</span></a></li>
+                <li><a href="#" class="menu-link" data-target="insights"><i class="fas fa-chart-line"></i> <span data-i18n="insights">Insights</span></a></li>
+                <li><a href="#" class="menu-link" data-target="budgets"><i class="fas fa-wallet"></i> <span data-i18n="budgets">Budgets</span></a></li>
+                <li><a href="#" class="menu-link" data-target="profile"><i class="fas fa-user-circle"></i> <span data-i18n="profile">Profile</span></a></li>
+                <li><a href="#" class="menu-link" data-target="settings"><i class="fas fa-cog"></i> <span data-i18n="settings">Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="header">
+            <h1 data-i18n="dashboardHeader">Personal Finance Dashboard</h1>
+            <div class="header-actions">
+                <a href="#" class="nav-link" data-target="profile"><i class="fas fa-user-circle"></i></a>
+            </div>
+        </header>
+
+        <section id="dashboard" class="section active">
+            <h2 data-i18n="overview">Overview (Last 30 Days)</h2>
+            <div class="stats-grid">
+                <div class="stat-card balance-card">
+                    <div class="stat-icon"><i class="fas fa-balance-scale"></i></div>
+                    <div class="stat-label" data-i18n="netBalance">Net Balance</div>
+                    <div class="stat-value" id="total-balance">₹0</div>
+                </div>
+                <div class="stat-card income-card">
+                    <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="stat-label" data-i18n="totalIncome">Total Income</div>
+                    <div class="stat-value" id="total-income">₹0</div>
+                </div>
+                <div class="stat-card expense-card">
+                    <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                    <div class="stat-label" data-i18n="totalExpenses">Total Expenses</div>
+                    <div class="stat-value" id="total-expenses">₹0</div>
+                </div>
+                <div class="stat-card savings-card">
+                    <div class="stat-icon"><i class="fas fa-piggy-bank"></i></div>
+                    <div class="stat-label" data-i18n="savingsRate">Savings Rate</div>
+                    <div class="stat-value" id="savings-rate">0%</div>
+                </div>
+            </div>
+
+            <div class="flex-row">
+                <div class="chart-box">
+                    <h3 data-i18n="expenseDistribution">Expense Distribution (Last 30 Days)</h3>
+                    <div class="chart-container" style="height: 350px;">
+                        <canvas id="overviewChart"></canvas>
+                    </div>
+                </div>
+                <div class="recent-transactions-box">
+                    <h3 data-i18n="recentTransactions">Recent Transactions</h3>
+                    <div class="transaction-list" id="recent-transactions">
+                        </div>
+                    <a href="#" class="view-all-link nav-link" data-target="transactions" data-i18n="viewAll">View All</a>
+                </div>
+            </div>
+
+            <div class="insights-box">
+                <h3 data-i18n="aiInsights">AI Insights</h3>
+                <div class="insight-grid" id="ai-insights">
+                    </div>
+            </div>
+        </section>
+
+        <section id="add-transaction" class="section">
+            <h2 data-i18n="addNewTransaction">Add New Transaction</h2>
+            <div class="tab-container" data-active-tab="manual">
+                <div class="tabs">
+                    <button class="tab active" data-tab="manual" data-i18n="manualEntry">Manual Entry</button>
+                    <button class="tab" data-tab="parse" data-i18n="smsEmailParse">SMS/Email Parse (AI)</button>
+                </div>
+                
+                <div class="tab-content-wrapper">
+                    <div id="manual-tab" class="tab-content active">
+                        <form id="transaction-form" class="transaction-form">
+                            <div class="form-group">
+                                <label for="transaction-type" data-i18n="type">Type</label>
+                                <select id="transaction-type" required>
+                                    <option value="expense" data-i18n="expense">Expense</option>
+                                    <option value="income" data-i18n="income">Income</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-amount" data-i18n="amount">Amount</label>
+                                <input type="number" id="transaction-amount" data-i18n-placeholder="amountPlaceholder" placeholder="e.g., 500.00" min="0.01" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-category" data-i18n="category">Category</label>
+                                <select id="transaction-category" required>
+                                    </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-description" data-i18n="description">Description</label>
+                                <input type="text" id="transaction-description" data-i18n-placeholder="descriptionPlaceholder" placeholder="e.g., Starbucks coffee" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-date" data-i18n="date">Date</label>
+                                <input type="date" id="transaction-date" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span data-i18n="addTransactionBtn">Add Transaction</span></button>
+                        </form>
+                    </div>
+
+                    <div id="parse-tab" class="tab-content">
+                        <div class="parse-group">
+                            <h3 data-i18n="parseSMS">Parse SMS Content</h3>
+                            <textarea id="sms-content" data-i18n-placeholder="smsPlaceholder" placeholder="Paste your bank SMS content here..."></textarea>
+                            <button id="parse-sms" class="btn btn-secondary"><i class="fas fa-comment"></i> <span data-i18n="autoAddSMS">Auto-Add from SMS</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="transactions" class="section">
+            <h2 data-i18n="allTransactions">All Transactions</h2>
+            
+            <div class="transaction-controls">
+                <select id="export-type-filter">
+                    <option value="all" data-i18n="allTransactions">All Transactions</option>
+                    <option value="income" data-i18n="onlyIncome">Only Income</option>
+                    <option value="expense" data-i18n="onlyExpense">Only Expense</option>
+                </select>
+                <div class="date-range-filter">
+                    <input type="date" id="export-start-date">
+                    <span data-i18n="to">to</span>
+                    <input type="date" id="export-end-date">
+                </div>
+                <button id="export-transactions-btn" class="btn btn-primary"><i class="fas fa-download"></i> <span data-i18n="exportCSV">Export CSV</span></button>
+            </div>
+            
+            <div class="transaction-list full-list" id="all-transactions">
+                </div>
+        </section>
+
+        <section id="insights" class="section">
+            <h2 data-i18n="detailedInsights">Detailed Financial Insights</h2>
+            <div id="detailed-insights">
+                <div class="empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Detailed Insights (Trend analysis, anomaly detection) will appear here.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="budgets" class="section">
+            <h2 data-i18n="manageBudgets">Manage Budgets</h2>
+            <div class="budget-grid">
+                <div class="budget-creation-box">
+                    <h3 data-i18n="createBudget">Create New Budget</h3>
+                    <form id="budget-form">
+                        <div class="form-group">
+                            <label for="budget-category" data-i18n="category">Category</label>
+                            <select id="budget-category" required>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="budget-amount" data-i18n="monthlyLimit">Monthly Limit</label>
+                            <input type="number" id="budget-amount" placeholder="5000.00" min="1" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary"><i class="fas fa-plus"></i> <span data-i18n="setBudget">Set Budget</span></button>
+                    </form>
+                </div>
+                
+                <div class="budget-overview-box">
+                    <h3 data-i18n="currentBudgets">Current Budgets (This Month)</h3>
+                    <div id="budget-list">
+                        </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="profile" class="section">
+            <h2 data-i18n="userProfile">User Profile</h2>
+            <div class="profile-card-grid">
+                <div class="profile-info-card">
+                    <div class="profile-header">
+                        <i class="fas fa-user-circle profile-icon"></i>
+                        <h3 data-i18n="accountDetails">Account Details</h3>
+                    </div>
+                    <div class="profile-details">
+                        <p><strong><span data-i18n="username">Username</span>:</strong> <span id="profile-username">FinSmartUser_123</span></p>
+                        <p><strong><span data-i18n="email">Email</span>:</strong> <span id="profile-email">user@finsmart.com</span></p>
+                        <p><strong><span data-i18n="memberSince">Member Since</span>:</strong> <span id="profile-join-date">2025-01-15</span></p>
+                        <p><strong><span data-i18n="status">Status</span>:</strong> <span id="profile-status" class="status-active">Active</span></p>
+                    </div>
+                </div>
+                
+                <div class="profile-stat-card">
+                    <h3 data-i18n="stats">Statistics (All Time)</h3>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="totalTransactions">Total Transactions Tracked:</span>
+                        <span class="stat-value" id="profile-total-tx">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="highestExpense">Highest Expense:</span>
+                        <span class="stat-value" id="profile-highest-expense">₹0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="averageSpending">Average Monthly Spending:</span>
+                        <span class="stat-value" id="profile-avg-spending">₹0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-action-card">
+                <h3 data-i18n="security">Security & Actions</h3>
+                <button class="btn btn-warning"><i class="fas fa-key"></i> <span data-i18n="changePassword">Change Password</span></button>
+                <button class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Logout</span></button>
+                <p class="data-warning" data-i18n="dataExportNote">All data can be exported via the Transactions page.</p>
+            </div>
+        </section>
+
+        <section id="settings" class="section">
+            <h2 data-i18n="settingsTitle">Application Settings</h2>
+            <form id="settings-form" class="settings-form-grid">
+                <div class="settings-group">
+                    <h3 data-i18n="financialSettings">Financial Settings</h3>
+                    <div class="form-group">
+                        <label for="currency" data-i18n="baseCurrency">Base Currency</label>
+                        <select id="currency" required>
+                            <option value="INR">INR (₹)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="financial-year" data-i18n="financialYearStart">Financial Year Start</label>
+                        <select id="financial-year">
+                            <option value="Jan">January</option>
+                            <option value="Apr">April</option>
+                            <option value="Jul">July</option>
+                            <option value="Oct">October</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3 data-i18n="uiSettings">User Interface</h3>
+                    <div class="form-group">
+                        <label for="language" data-i18n="language">Language</label>
+                        <select id="language">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi (हिंदी)</option>
+                        </select>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="dark-mode">
+                        <label for="dark-mode" data-i18n="darkMode">Enable Dark Mode</label>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="notifications" checked>
+                        <label for="notifications" data-i18n="enableNotifications">Enable Notifications</label>
+                    </div>
+                </div>
+                
+                <div class="settings-group span-full">
+                    <h3 data-i18n="dataManagement">Data Management</h3>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary"><i class="fas fa-undo"></i> <span data-i18n="backupData">Backup Data</span></button>
+                        <button type="button" class="btn btn-danger" id="clear-local-data-btn"><i class="fas fa-trash"></i> <span data-i18n="clearLocalData">Clear Local Cache</span></button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary span-full"><i class="fas fa-save"></i> <span data-i18n="saveSettings">Save Settings</span></button>
+            </form>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
